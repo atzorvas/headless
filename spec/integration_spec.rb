@@ -3,7 +3,7 @@ require 'selenium-webdriver'
 
 describe 'Integration test' do
   it 'should start xvfb' do
-    Headless.ly do
+    Headless.ly(xvfb_launch_timeout: 20) do
       driver = Selenium::WebDriver.for :firefox
       driver.navigate.to 'http://google.com'
       expect(driver.title).to match /Google/
@@ -12,7 +12,7 @@ describe 'Integration test' do
   end
 
   it 'should record screenshots' do
-    Headless.ly do |headless|
+    Headless.ly(xvfb_launch_timeout: 20) do |headless|
       driver = Selenium::WebDriver.for :firefox
       driver.navigate.to 'http://google.com'
       expect(driver.title).to match /Google/
@@ -23,7 +23,7 @@ describe 'Integration test' do
   end
 
   it 'should record video with ffmpeg' do
-    Headless.ly do |headless|
+    Headless.ly(xvfb_launch_timeout: 20) do |headless|
       headless.video.start_capture
       driver = Selenium::WebDriver.for :firefox
       driver.navigate.to 'http://google.com'

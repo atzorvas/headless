@@ -3,5 +3,5 @@ rvm:
   - 1.9.3
   - 2.0
   - 2.2
-before_script: "sudo apt-get update; sudo apt-get install -y libav-tools firefox xvfb"
+before_script: "sudo apt-get update; sudo apt-get install -y libav-tools firefox xvfb; ln -fs /usr/bin/avconv /usr/bin/ffmpeg"
 script: "rspec"
