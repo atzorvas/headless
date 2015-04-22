@@ -23,7 +23,7 @@ describe 'Integration test' do
   end
 
   it 'should record video with ffmpeg' do
-    Headless.ly(display: 999, video: {provider: :ffmpeg}) do |headless|
+    Headless.ly(display: 999, video: {log_file_path: STDERR}) do |headless|
       headless.video.start_capture
       driver = Selenium::WebDriver.for :firefox
       driver.navigate.to 'http://google.com'

@@ -160,7 +160,7 @@ private
 
   def launch_xvfb
     #TODO error reporting
-    result = system "#{CliUtil.path_to("Xvfb")} :#{display} -screen 0 #{dimensions} -ac >/dev/null 2>&1 &"
+    result = system "#{CliUtil.path_to("Xvfb")} :#{display} -screen 0 #{dimensions} -ac >/dev/null &"
     raise Headless::Exception.new("Xvfb did not launch - something's wrong") unless result
     ensure_xvfb_is_running
     return true
@@ -170,7 +170,7 @@ private
     start_time = Time.now
     begin
       sleep 0.01 # to avoid cpu hogging
-      raise Headless::Exception.new("Xvfb is frozen") if (Time.now-start_time)>=@xvfb_launch_timeout
+      raise Headless::Exception.new("Xvfb launched but did not complete initialization") if (Time.now-start_time)>=@xvfb_launch_timeout
     end while !xvfb_running?
   end
 
