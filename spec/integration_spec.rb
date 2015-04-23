@@ -1,12 +1,11 @@
 require 'headless'
 require 'selenium-webdriver'
 
-# In these tests I use different display numbers to avoid
 describe 'Integration test' do
-  let(:headless) { Headless.new }
+  let!(:headless) { Headless.new }
   before { headless.start }
 
-  after { headless.destroy(wait: true) }
+  after { headless.destroy_sync }
 
   it 'should use xvfb' do
     work_with_browser
@@ -23,6 +22,16 @@ describe 'Integration test' do
     headless.video.stop_and_save("test.mov")
     expect(File.exist?("test.mov")).to eq true
   end
+
+  it 'should raise an error when trying to create the same display' do
+    expect {
+      FileUtils.mv("/tmp/.X#{headless.display}-lock", "/tmp/headless-test-tmp")
+      Headless.new(display: headless.display, reuse: false)
+    }.to raise_error(Headless::Exception, /troubleshooting guide/)
+    FileUtils.mv("/tmp/headless-test-tmp", "/tmp/.X#{headless.display}-lock")
+  end
+
+  private
 
   def work_with_browser
     driver = Selenium::WebDriver.for :firefox

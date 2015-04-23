@@ -101,11 +101,15 @@ class Headless
   end
 
   # Switches back from the headless server and terminates the headless session
-  # Call destroy(wait: true) if you need to block until the Xvfb process
-  # terminates
-  def destroy(options={})
+  def destroy
     stop
-    CliUtil.kill_process(pid_filename, options)
+    CliUtil.kill_process(pid_filename, preserve_pid_file: true)
+  end
+
+  # Same as destroy, but waits for Xvfb process to terminate
+  def destroy_sync
+    stop
+    CliUtil.kill_process(pid_filename, preserve_pid_file: true, wait: true)
   end
 
   # Block syntax:
@@ -161,16 +165,28 @@ private
   end
 
   def launch_xvfb
-    #TODO error reporting
-    result = system "#{CliUtil.path_to("Xvfb")} :#{display} -screen 0 #{dimensions} -ac >/dev/null &"
-    raise Headless::Exception.new("Xvfb did not launch - something's wrong") unless result
-    ensure_xvfb_is_running
+    out_pipe, in_pipe = IO.pipe
+    pid = Process.spawn(
+      CliUtil.path_to("Xvfb"), ":#{display}", "-screen", "0", dimensions, "-ac",
+      err: in_pipe)
+    in_pipe.close
+    raise Headless::Exception.new("Xvfb did not launch - something's wrong") unless pid
+    ensure_xvfb_is_running(out_pipe)
     return true
   end
 
-  def ensure_xvfb_is_running
+  def ensure_xvfb_is_running(out_pipe)
     start_time = Time.now
+    errors = ""
     begin
+      begin
+        errors += out_pipe.read_nonblock(10000)
+        if errors.include? "Cannot establish any listening sockets"
+          raise Headless::Exception.new("Display socket is taken but lock file is missing - check the Headless troubleshooting guide")
+        end
+      rescue IO::WaitReadable
+        # will retry next cycle
+      end
       sleep 0.01 # to avoid cpu hogging
       raise Headless::Exception.new("Xvfb launched but did not complete initialization") if (Time.now-start_time)>=@xvfb_launch_timeout
     end while !xvfb_running?
@@ -199,4 +215,3 @@ private
     end
   end
 end
-
