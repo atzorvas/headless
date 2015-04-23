@@ -5,8 +5,6 @@ class Headless
     attr_accessor :pid_file_path, :tmp_file_path, :log_file_path
 
     def initialize(display, dimensions, options = {})
-      CliUtil.ensure_application_exists!('ffmpeg', 'Ffmpeg not found on your system. Install it with sudo apt-get install ffmpeg')
-
       @display = display
       @dimensions = dimensions[/.+(?=x)/]
 
@@ -17,6 +15,8 @@ class Headless
       @frame_rate = options.fetch(:frame_rate, 30)
       @provider = options.fetch(:provider, :libav)  # or :ffmpeg
       @extra = Array(options.fetch(:extra, []))
+
+      CliUtil.ensure_application_exists!(provider_binary, "#{provider_binary} not found on your system. Install it or change video recorder provider")
     end
 
     def capture_running?
@@ -55,19 +55,21 @@ class Headless
 
     private
 
+    def provider_binary
+      @provider==:libav ? 'avconv' : 'ffmpeg'
+    end
+
     def command_line_for_capture
       if @provider == :libav
-        tool = 'avconv'
         group_of_pic_size_option = '-g 600'
         dimensions = @dimensions
       else
-        tool = 'ffmpeg'
         group_of_pic_size_option = nil
         dimensions = @dimensions.match(/^(\d+x\d+)/)[0]
       end
 
       ([
-        CliUtil.path_to(tool),
+        CliUtil.path_to(provider_binary),
         "-y",
         "-r #{@frame_rate}",
         "-s #{dimensions}",
