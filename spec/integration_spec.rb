@@ -17,7 +17,7 @@ describe 'Integration test' do
   end
 
   it 'should record video with ffmpeg' do
-    system('firefox &') if ENV['TRAVIS'] # fix error with avconv http://superuser.com/a/593534
+    system('xeyes &') if ENV['TRAVIS'] # fix error with avconv http://superuser.com/a/593534
     headless.video.start_capture
     work_with_browser
     headless.video.stop_and_save("test.mov")
