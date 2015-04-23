@@ -2,7 +2,7 @@ require 'headless'
 require 'selenium-webdriver'
 
 describe 'Integration test' do
-  let!(:headless) { Headless.new }
+  let!(:headless) { Headless.new(video: {log_file_path: STDERR}) }
   before { headless.start }
 
   after { headless.destroy_sync }
