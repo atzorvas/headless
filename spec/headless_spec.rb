@@ -27,7 +27,6 @@ describe Headless do
       context "when Xvfb is not installed" do
         before do
           allow(Headless::CliUtil).to receive(:application_exists?).and_return(false)
-          stub_launch
         end
 
         it "raises an error" do
@@ -39,7 +38,6 @@ describe Headless do
         before do
           allow(Headless::CliUtil).to receive(:read_pid).with('/tmp/.X99-lock').and_return(31337)
           allow(Headless::CliUtil).to receive(:read_pid).with('/tmp/.X100-lock').and_return(nil)
-          stub_launch
         end
 
         context "and display reuse is allowed" do
@@ -79,7 +77,6 @@ describe Headless do
         before do
           allow(Headless::CliUtil).to receive(:read_pid).with('/tmp/.X99-lock') { raise Errno::EPERM }
           allow(Headless::CliUtil).to receive(:read_pid).with('/tmp/.X100-lock').and_return(nil)
-          stub_launch
         end
 
         context "and display autopicking is not allowed" do
