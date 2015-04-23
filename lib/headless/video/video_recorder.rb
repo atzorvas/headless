@@ -23,27 +23,6 @@ class Headless
       CliUtil.read_pid @pid_file_path
     end
 
-    def command_line_for_capture
-      if @provider == :libav
-        group_of_pic_size_option = '-g 600'
-        dimensions = @dimensions
-      else
-        group_of_pic_size_option = nil
-        dimensions = @dimensions.match(/^(\d+x\d+)/)[0]
-      end
-
-      ([
-        CliUtil.path_to('ffmpeg'),
-        "-y",
-        "-r #{@frame_rate}",
-        "-s #{dimensions}",
-        "-f x11grab",
-        "-i :#{@display}",
-        group_of_pic_size_option,
-        "-vcodec #{@codec}"
-      ].compact + @extra + [@tmp_file_path]).join(' ')
-    end
-
     def start_capture
       CliUtil.fork_process(command_line_for_capture,
                            @pid_file_path, @log_file_path)
@@ -72,6 +51,31 @@ class Headless
       rescue Errno::ENOENT
         # that's ok if the file doesn't exist
       end
+    end
+
+    private
+
+    def command_line_for_capture
+      if @provider == :libav
+        tool = 'avconv'
+        group_of_pic_size_option = '-g 600'
+        dimensions = @dimensions
+      else
+        tool = 'ffmpeg'
+        group_of_pic_size_option = nil
+        dimensions = @dimensions.match(/^(\d+x\d+)/)[0]
+      end
+
+      ([
+        CliUtil.path_to(tool),
+        "-y",
+        "-r #{@frame_rate}",
+        "-s #{dimensions}",
+        "-f x11grab",
+        "-i :#{@display}",
+        group_of_pic_size_option,
+        "-vcodec #{@codec}"
+      ].compact + @extra + [@tmp_file_path]).join(' ')
     end
   end
 end
