@@ -2,7 +2,7 @@ require 'headless'
 require 'selenium-webdriver'
 
 describe 'Integration test' do
-  let!(:headless) { Headless.new(video: {log_file_path: STDERR}) }
+  let!(:headless) { Headless.new }
   before { headless.start }
 
   after { headless.destroy_sync }
@@ -16,7 +16,9 @@ describe 'Integration test' do
     expect(File.exist?("test.jpg")).to eq true
   end
 
-  it 'should record video with ffmpeg' do
+  # Unfortunately the libav version that ships with Ubuntu 12.04 has
+  # buggy X11 capture.
+  it 'should record video with ffmpeg', pending: ENV['TRAVIS'] do
     headless.video.start_capture
     work_with_browser
     headless.video.stop_and_save("test.mov")
