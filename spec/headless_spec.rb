@@ -7,6 +7,10 @@ describe Headless do
   end
 
   describe 'launch options' do
+    before do
+      allow_any_instance_of(Headless).to receive(:ensure_xvfb_is_running).and_return(true)
+    end
+
     it "starts Xvfb" do
       expect_any_instance_of(Headless).to receive(:system).with("/usr/bin/Xvfb :99 -screen 0 1280x1024x24 -ac >/dev/null &").and_return(true)
       headless = Headless.new
