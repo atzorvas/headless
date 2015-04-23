@@ -8,12 +8,12 @@ describe Headless do
 
   describe 'launch options' do
     it "starts Xvfb" do
-      expect_any_instance_of(Headless).to receive(:system).with("/usr/bin/Xvfb :99 -screen 0 1280x1024x24 -ac >/dev/null 2>&1 &").and_return(true)
+      expect_any_instance_of(Headless).to receive(:system).with("/usr/bin/Xvfb :99 -screen 0 1280x1024x24 -ac >/dev/null &").and_return(true)
       headless = Headless.new
     end
 
     it "allows setting screen dimensions" do
-      expect_any_instance_of(Headless).to receive(:system).with("/usr/bin/Xvfb :99 -screen 0 1024x768x16 -ac >/dev/null 2>&1 &").and_return(true)
+      expect_any_instance_of(Headless).to receive(:system).with("/usr/bin/Xvfb :99 -screen 0 1024x768x16 -ac >/dev/null &").and_return(true)
       headless = Headless.new(:dimensions => "1024x768x16")
     end
   end

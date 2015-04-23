@@ -101,9 +101,11 @@ class Headless
   end
 
   # Switches back from the headless server and terminates the headless session
-  def destroy
+  # Call destroy(wait: true) if you need to block until the Xvfb process
+  # terminates
+  def destroy(options={})
     stop
-    CliUtil.kill_process(pid_filename)
+    CliUtil.kill_process(pid_filename, options)
   end
 
   # Block syntax:

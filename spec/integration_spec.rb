@@ -3,14 +3,10 @@ require 'selenium-webdriver'
 
 # In these tests I use different display numbers to avoid
 describe 'Integration test' do
-  before do
-    @headless = Headless.new
-    @headless.start
-  end
+  let(:headless) { Headless.new }
+  before { headless.start }
 
-  after do
-    @headless.destroy
-  end
+  after { headless.destroy(wait: true) }
 
   it 'should use xvfb' do
     work_with_browser
