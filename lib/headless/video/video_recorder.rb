@@ -34,6 +34,7 @@ class Headless
     end
 
     def start_capture
+      puts command_line_for_capture
       CliUtil.fork_process(command_line_for_capture,
                            @pid_file_path, @log_file_path)
       at_exit do
@@ -85,8 +86,10 @@ class Headless
          "-s #{dimensions}",
          "-f x11grab#{@devices}",
          "-i :#{@display}",
+         "-f alsa -i pulse -ac 2 ",
          group_of_pic_size_option,
-         "-vcodec #{@codec}"
+         "-vcodec #{@codec}",
+         "-acodec libmp3lame -ar 44100 -ab 128k -threads 0"
       ].compact + @extra + [@tmp_file_path]).join(' ')
     end
   end
